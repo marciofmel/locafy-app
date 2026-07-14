@@ -15,20 +15,32 @@ export default function Plans() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [dbPlans, setDbPlans] = useState([]);
+  const [loading, setLoading] = useState(null);
+  const [err, setErr] = useState("");
 
   useEffect(() => {
-    fetch(`${API}/plans`).then(r => r.json()).then(setDbPlans).catch(() => {});
+    fetch(`${API}/plans`).then(r => r.json()).then(setDbPlans).catch(() => setErr("Erro ao carregar planos"));
   }, []);
 
   async function subscribe(planId) {
     if (!user) return navigate("/login");
+    if (!planId) return setErr("Plano indisponível");
+    setLoading(planId);
+    setErr("");
     const token = localStorage.getItem("token");
-    const res = await fetch(`${API}/plans/subscribe/${planId}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    if (data.url) window.location.href = data.url;
+    try {
+      const res = await fetch(`${API}/plans/subscribe/${planId}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+      else setErr(data.error || "Erro desconhecido");
+    } catch {
+      setErr("Erro de conexão");
+    } finally {
+      setLoading(null);
+    }
   }
 
   return (
@@ -56,12 +68,13 @@ export default function Plans() {
                 <li key={j} className="flex items-center gap-2 text-gray-600"><Check size={18} className="text-emerald-600 flex-shrink-0" />{f}</li>
               ))}
             </ul>
-            <button onClick={() => subscribe(dbPlans[i]?.id)} className={`w-full mt-8 ${plan.btn} text-white py-3 rounded-lg font-semibold hover:opacity-90 transition`}>
-              {user ? "Assinar agora" : "Cadastre-se grátis"}
+            <button onClick={() => subscribe(dbPlans[i]?.id)} disabled={loading !== null} className={`w-full mt-8 ${plan.btn} text-white py-3 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50`}>
+              {loading === dbPlans[i]?.id ? "Processando..." : (user ? "Assinar agora" : "Cadastre-se grátis")}
             </button>
           </div>
         ))}
       </div>
+      {err && <p className="text-red-600 text-center mt-6">{err}</p>}
     </div>
   );
 }
