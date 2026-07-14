@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  phone         String
+  password      String
+  role          String    @default("landlord")
+  cpf           String?
+  rgDocument    String?
+  selfie        String?
+  cnh           String?
+  docStatus     String    @default("none")
+  docVerifiedAt DateTime?
+  mpCustomerId String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  listings      Listing[]
+  favorites     Favorite[]
+  subscription  Subscription?
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  icon     String?
+  listings Listing[]
+}
+
+model Listing {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  priceType   String   @default("daily")
+  images      String[]
+  videos      String[]
+  whatsapp    String
+  street      String?
+  number      String?
+  neighborhood String?
+  city        String?
+  state       String?
+  active      Boolean  @default(true)
+  features    String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  favorites  Favorite[]
+}
+
+model Plan {
+  id        String   @id @default(cuid())
+  name      String
+  price     Float
+  interval  String   @default("month")
+  features  String[]
+  mpPlanId String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id            String    @id @default(cuid())
+  status        String    @default("active")
+  mpSubscriptionId String?
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+  planId String
+  plan   Plan   @relation(fields: [planId], references: [id])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id])
+
+  @@unique([userId, listingId])
+}

@@ -1,0 +1,34 @@
+# Render YAML - Deploy automatizado do Locafy
+# Frontend + Backend em um único Web Service
+
+services:
+  - type: web
+    name: locafy-app
+    runtime: node
+    region: virginia
+    plan: free
+    buildCommand: cd backend && npm install && npx prisma generate && cd ../frontend && npm install && npm run build
+    startCommand: cd backend && node src/server.js
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: locafy-db
+          property: connectionString
+      - key: MP_ACCESS_TOKEN
+        value: APP_USR-1355545914013679-071119-f8fc8fec114434fdf8dc17a78e82f278-333641258
+      - key: JWT_SECRET
+        value: locafy-jwt-secret-prod-2026
+      - key: FRONTEND_URL
+        value: https://locafy-app.onrender.com
+      - key: CLOUDINARY_URL
+        value: cloudinary://752435217587387:V_yUQapNvIgMs8zTPLu4kARB4X8@vwce66jf
+      - key: NODE_VERSION
+        value: 22
+
+databases:
+  - name: locafy-db
+    plan: free
+    region: virginia
+    postgresMajorVersion: "18"

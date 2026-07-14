@@ -1,0 +1,10 @@
+{
+  "name": "locafy",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "render-build": "cd backend && npm install && npx prisma generate && cd ../frontend && npm install && npm run build",
+    "render-start": "cd backend && node src/server.js",
+    "dev": "cd backend && npm run dev"
+  }
+}
