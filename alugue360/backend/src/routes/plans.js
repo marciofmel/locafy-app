@@ -42,7 +42,6 @@ router.post("/subscribe/:planId", authMiddleware, async (req, res) => {
       back_url: `${baseUrl}/dashboard`,
       auto_return: "approved",
       external_reference: `${user.id}:${plan.id}`,
-      status: "authorized",
       auto_recurring: {
         frequency: 1,
         frequency_type: plan.interval || "months",
@@ -76,7 +75,7 @@ router.post("/subscribe/:planId", authMiddleware, async (req, res) => {
     if (!mpRes.ok) {
       const errText = await mpRes.text();
       console.error("MP API error:", mpRes.status, errText);
-      return res.status(502).json({ error: "Erro no Mercado Pago. Verifique o token." });
+      return res.status(502).json({ error: `MP error ${mpRes.status}: ${errText}` });
     }
 
     const mpSub = await mpRes.json();
