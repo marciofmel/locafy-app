@@ -32,16 +32,19 @@ router.post("/subscribe/:planId", authMiddleware, async (req, res) => {
     const user = await prisma.user.findUnique({ where: { id: req.userId } });
     const baseUrl = req.headers.origin || process.env.FRONTEND_URL || "http://localhost:5173";
 
-    if (!MP_ACCESS_TOKEN || !baseUrl.startsWith("https")) {
-      return res.status(400).json({ error: "Pagamento indisponível: configure o Mercado Pago ou use HTTPS" });
+    if (!MP_ACCESS_TOKEN) {
+      return res.status(400).json({ error: "Pagamento indisponível: Mercado Pago não configurado" });
     }
+
+    const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3001";
 
     const body = {
       reason: plan.name,
       payer_email: user.email,
-      back_url: `${baseUrl}/dashboard`,
+      back_url: `${baseUrl}/payment/success`,
       auto_return: "approved",
       external_reference: `${user.id}:${plan.id}`,
+      notification_url: `${BACKEND_URL}/webhook/mercadopago`,
       auto_recurring: {
         frequency: 1,
         frequency_type: plan.interval || "months",

@@ -1,39 +1,83 @@
-import { MercadoPagoConfig, Payment } from "mercadopago";
+import pkg from "mercadopago";
 import { Router } from "express";
-import express from "express";
 import { prisma } from "../server.js";
 
+const { MercadoPagoConfig, Payment, PreApproval } = pkg;
 const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN || "" });
 const payment = new Payment(client);
+const preapproval = new PreApproval(client);
 
 const router = Router();
 
-router.post("/mercadopago", express.raw({ type: "application/json" }), async (req, res) => {
+router.post("/mercadopago", async (req, res) => {
   try {
-    const body = Buffer.isBuffer(req.body) ? JSON.parse(req.body.toString()) : req.body;
-    const { type, data } = body;
+    const { type, data, action } = req.body;
+    const id = data?.id?.toString();
+
+    if (!id) return res.sendStatus(200);
+
     if (type === "payment") {
-      const paymentInfo = await payment.get({ id: data.id });
-      const external = paymentInfo.external_reference;
-      if (external) {
+      const info = await payment.get({ id });
+      const external = info?.external_reference;
+      if (external && info?.status === "approved") {
         const [userId, planId] = external.split(":");
-        await prisma.subscription.upsert({
-          where: { userId },
-          update: { status: "active", planId, mpSubscriptionId: data.id.toString(), currentPeriodStart: new Date(), currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) },
-          create: { userId, planId, status: "active", mpSubscriptionId: data.id.toString(), currentPeriodStart: new Date(), currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) },
+        if (userId && planId) {
+          await prisma.subscription.upsert({
+            where: { userId },
+            update: { status: "active", planId },
+            create: { userId, planId, status: "active", mpSubscriptionId: id },
+          });
+        }
+      }
+    }
+
+    if (type === "preapproval") {
+      let sub = await prisma.subscription.findFirst({ where: { mpSubscriptionId: id } });
+
+      if (!sub) {
+        try {
+          const info = await preapproval.get({ id });
+          const ext = info?.external_reference;
+          if (ext) {
+            const [userId, planId] = ext.split(":");
+            if (userId && planId) {
+              sub = await prisma.subscription.upsert({
+                where: { userId },
+                update: { mpSubscriptionId: id },
+                create: { userId, planId, status: "pending", mpSubscriptionId: id },
+              });
+            }
+          }
+        } catch { }
+      }
+
+      if (sub && action !== "preapproval.cancelled") {
+        await prisma.subscription.update({
+          where: { id: sub.id },
+          data: { status: "active" },
+        });
+      }
+
+      if (sub && action === "preapproval.cancelled") {
+        await prisma.subscription.update({
+          where: { id: sub.id },
+          data: { status: "cancelled" },
         });
       }
     }
-    if (type === "preapproval") {
-      const preId = data.id;
-      const sub = await prisma.subscription.findFirst({ where: { mpSubscriptionId: preId.toString() } });
+
+    if (type === "subscription_preapproval" || type === "subscription_authorized_payment") {
+      const sub = await prisma.subscription.findFirst({
+        where: { mpSubscriptionId: id },
+      });
       if (sub) {
         await prisma.subscription.update({
           where: { id: sub.id },
-          data: { status: "active", currentPeriodStart: new Date(), currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) },
+          data: { status: "active" },
         });
       }
     }
+
     res.sendStatus(200);
   } catch {
     res.sendStatus(200);

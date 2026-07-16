@@ -12,6 +12,8 @@ import NewListing from "./pages/NewListing";
 import EditListing from "./pages/EditListing";
 import Favorites from "./pages/Favorites";
 import Documents from "./pages/Documents";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCancel from "./pages/PaymentCancel";
 
 export default function App() {
   return (
@@ -30,6 +32,8 @@ export default function App() {
             <Route path="/editar/:id" element={<EditListing />} />
             <Route path="/favoritos" element={<Favorites />} />
             <Route path="/documentos" element={<Documents />} />
+            <Route path="/payment/success" element={<PaymentSuccess />} />
+            <Route path="/payment/cancel" element={<PaymentCancel />} />
           </Route>
         </Routes>
       </AuthProvider>
