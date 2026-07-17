@@ -6,6 +6,7 @@ import { Check, Sparkles } from "lucide-react";
 import { API } from "../config";
 
 const plans = [
+  { name: "Teste", price: "1,00", listings: 1, features: ["1 anúncio", "Apenas para testes"], color: "bg-yellow-50 border-yellow-300", btn: "bg-yellow-500" },
   { name: "Básico", price: "29,99", listings: 2, features: ["2 anúncios inclusos", "Fotos ilimitadas", "WhatsApp direto", "R$15 por anúncio extra"], color: "bg-gray-100", btn: "bg-gray-600" },
   { name: "Profissional", price: "49,99", listings: 6, features: ["6 anúncios inclusos", "Fotos ilimitadas", "WhatsApp direto", "Destaque por 7 dias", "R$15 por anúncio extra"], color: "bg-emerald-50 border-emerald-300", btn: "bg-emerald-600", popular: true },
   { name: "Premium", price: "89,99", listings: 12, features: ["12 anúncios inclusos", "Fotos ilimitadas", "WhatsApp direto", "Destaque permanente", "Suporte prioritário", "R$15 por anúncio extra"], color: "bg-purple-50 border-purple-300", btn: "bg-purple-600" },
@@ -50,7 +51,7 @@ export default function Plans() {
         <p className="text-gray-500 mt-2">Anuncie imóveis, veículos e espaços para eventos</p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-4 gap-4">
         {plans.map((plan, i) => (
           <div key={i} className={`relative rounded-2xl border-2 p-6 ${plan.color} ${plan.popular ? "border-emerald-500 shadow-lg scale-105" : "border-gray-200"}`}>
             {plan.popular && (
