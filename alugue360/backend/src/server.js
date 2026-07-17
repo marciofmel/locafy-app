@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import multer from "multer";
+import { execSync } from "child_process";
 import { fileURLToPath } from "url";
 import { PrismaClient } from "@prisma/client";
 import authRoutes from "./routes/auth.js";
@@ -14,6 +15,12 @@ import uploadRoutes from "./routes/upload.js";
 import favoriteRoutes from "./routes/favorites.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+try {
+  console.log("📦 Rodando prisma db push...");
+  execSync("npx prisma db push --accept-data-loss", { stdio: "inherit", cwd: path.join(__dirname, "..") });
+  console.log("✅ prisma db push concluído");
+} catch { console.log("⚠️ prisma db push falhou, continuando mesmo assim"); }
 
 export const prisma = new PrismaClient();
 
