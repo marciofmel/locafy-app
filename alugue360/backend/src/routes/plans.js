@@ -13,14 +13,17 @@ router.get("/", async (req, res) => {
       { name: "Básico", price: 29.99, maxListings: 2, features: ["2 anúncios inclusos", "Fotos ilimitadas", "WhatsApp direto", "R$15 por anúncio extra"] },
       { name: "Profissional", price: 49.99, maxListings: 6, features: ["6 anúncios inclusos", "Fotos ilimitadas", "WhatsApp direto", "Destaque por 7 dias", "R$15 por anúncio extra"] },
       { name: "Premium", price: 89.99, maxListings: 12, features: ["12 anúncios inclusos", "Fotos ilimitadas", "WhatsApp direto", "Destaque permanente", "Suporte prioritário", "R$15 por anúncio extra"] },
+      { name: "Teste", price: 1, maxListings: 1, features: ["1 anúncio", "Apenas para testes"] },
     ];
     if (plans.length === 0) {
       for (const p of PLAN_DATA) plans.push(await prisma.plan.create({ data: { ...p, interval: "months" } }));
     } else {
-      for (const plan of plans) {
-        const pdata = PLAN_DATA.find(p => p.name === plan.name);
-        if (pdata && (plan.price !== pdata.price || plan.maxListings !== pdata.maxListings)) {
-          await prisma.plan.update({ where: { id: plan.id }, data: { price: pdata.price, maxListings: pdata.maxListings, features: pdata.features } });
+      for (const pdata of PLAN_DATA) {
+        const existing = plans.find(p => p.name === pdata.name);
+        if (!existing) {
+          plans.push(await prisma.plan.create({ data: { ...pdata, interval: "months" } }));
+        } else if (existing.price !== pdata.price || existing.maxListings !== pdata.maxListings) {
+          await prisma.plan.update({ where: { id: existing.id }, data: { price: pdata.price, maxListings: pdata.maxListings, features: pdata.features } });
         }
       }
     }
