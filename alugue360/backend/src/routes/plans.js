@@ -9,14 +9,22 @@ const MP_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN || "";
 router.get("/", async (req, res) => {
   try {
     let plans = await prisma.plan.findMany({ where: { active: true } });
+    const PLAN_DATA = [
+      { name: "Básico", price: 29.99, maxListings: 2, features: ["2 anúncios inclusos", "Fotos ilimitadas", "WhatsApp direto", "R$15 por anúncio extra"] },
+      { name: "Profissional", price: 49.99, maxListings: 6, features: ["6 anúncios inclusos", "Fotos ilimitadas", "WhatsApp direto", "Destaque por 7 dias", "R$15 por anúncio extra"] },
+      { name: "Premium", price: 89.99, maxListings: 12, features: ["12 anúncios inclusos", "Fotos ilimitadas", "WhatsApp direto", "Destaque permanente", "Suporte prioritário", "R$15 por anúncio extra"] },
+    ];
     if (plans.length === 0) {
-      const data = [
-        { name: "Básico", price: 29.99, interval: "months", maxListings: 2, features: ["2 anúncios inclusos", "Fotos ilimitadas", "WhatsApp direto", "R$15 por anúncio extra"] },
-        { name: "Profissional", price: 49.99, interval: "months", maxListings: 6, features: ["6 anúncios inclusos", "Fotos ilimitadas", "WhatsApp direto", "Destaque por 7 dias", "R$15 por anúncio extra"] },
-        { name: "Premium", price: 89.99, interval: "months", maxListings: 12, features: ["12 anúncios inclusos", "Fotos ilimitadas", "WhatsApp direto", "Destaque permanente", "Suporte prioritário", "R$15 por anúncio extra"] },
-      ];
-      for (const p of data) plans.push(await prisma.plan.create({ data: p }));
+      for (const p of PLAN_DATA) plans.push(await prisma.plan.create({ data: { ...p, interval: "months" } }));
+    } else {
+      for (const plan of plans) {
+        const pdata = PLAN_DATA.find(p => p.name === plan.name);
+        if (pdata && (plan.price !== pdata.price || plan.maxListings !== pdata.maxListings)) {
+          await prisma.plan.update({ where: { id: plan.id }, data: { price: pdata.price, maxListings: pdata.maxListings, features: pdata.features } });
+        }
+      }
     }
+    plans = await prisma.plan.findMany({ where: { active: true } });
     res.json(plans);
   } catch (err) {
     console.error(err);
