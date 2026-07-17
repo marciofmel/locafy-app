@@ -4,8 +4,8 @@ services:
     runtime: node
     region: virginia
     plan: free
-    buildCommand: cd alugue360/backend && npm install && npx prisma db push && cd ../frontend && npm install && npm run build
-    startCommand: cd alugue360/backend && node src/server.js
+    buildCommand: cd alugue360/backend && npm install && npx prisma generate && cd ../frontend && npm install && npm run build
+    startCommand: cd alugue360/backend && npx prisma db push --accept-data-loss && node src/server.js
     autoDeploy: true
     healthCheckPath: /api/health
     envVars:
