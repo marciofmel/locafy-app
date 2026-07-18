@@ -70,8 +70,8 @@ export default function Plans() {
                 <li key={j} className="flex items-center gap-2 text-gray-600"><Check size={18} className="text-emerald-600 flex-shrink-0" />{f}</li>
               ))}
             </ul>
-            <button onClick={() => subscribe(dbPlans[i]?.id)} disabled={loading !== null} className={`w-full mt-8 ${plan.btn} text-white py-3 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50`}>
-              {loading === dbPlans[i]?.id ? "Processando..." : (user ? "Assinar agora" : "Cadastre-se grátis")}
+            <button onClick={() => subscribe(dbPlans.find(p => p.name === plan.name)?.id)} disabled={loading !== null} className={`w-full mt-8 ${plan.btn} text-white py-3 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50`}>
+              {loading === dbPlans.find(p => p.name === plan.name)?.id ? "Processando..." : (user ? "Assinar agora" : "Cadastre-se grátis")}
             </button>
           </div>
         ))}
