@@ -47,6 +47,7 @@ export default function PaymentCardForm() {
         onSubmit: (cardFormData) => {
           return new Promise((resolve, reject) => {
             const cardTokenId = cardFormData.token;
+            const paymentMethodId = cardFormData.payment_method_id;
             if (!cardTokenId) {
               setErr("Erro ao gerar token do cartão");
               setSubmitting(false);
@@ -57,7 +58,7 @@ export default function PaymentCardForm() {
             fetch(`${API}/plans/subscribe-with-card`, {
               method: "POST",
               headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ planId, cardTokenId }),
+              body: JSON.stringify({ planId, cardTokenId, paymentMethodId }),
               signal: controller.signal,
             }).then(r => r.json()).then(res => {
               clearTimeout(timeout);
