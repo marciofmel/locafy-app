@@ -168,17 +168,24 @@ router.post("/subscribe-with-card", authMiddleware, async (req, res) => {
     }
 
     const mpSub = await mpRes.json();
+    const cardId = mpSub.card_id;
+
+    if (!cardId) {
+      console.error("MP não retornou card_id na preapproval");
+      return res.status(502).json({ error: "Cartão não foi salvo para cobrança recorrente" });
+    }
 
     const paymentBody = {
       transaction_amount: plan.price,
-      token: cardTokenId,
       description: `${plan.name} - 1º mês`,
       installments: 1,
+      payment_method_id: mpSub.payment_method_id || "master",
+      card: { id: cardId },
       payer: { email: user.email },
       external_reference: `${user.id}:${plan.id}`,
-      metadata: { subscription_id: mpSub.id },
     };
 
+    let paymentApproved = false;
     let paymentRes;
     try {
       paymentRes = await fetch("https://api.mercadopago.com/v1/payments", {
@@ -189,18 +196,16 @@ router.post("/subscribe-with-card", authMiddleware, async (req, res) => {
         },
         body: JSON.stringify(paymentBody),
       });
+      if (paymentRes.ok) {
+        const payData = await paymentRes.json();
+        paymentApproved = payData.status === "approved";
+        console.log("MP payment result:", payData.status, payData.status_detail);
+      } else {
+        const payErrText = await paymentRes.text();
+        console.error("MP payment error:", paymentRes.status, payErrText);
+      }
     } catch (payErr) {
-      console.error("MP payment error:", payErr?.message || payErr);
-    }
-
-    let paymentApproved = false;
-    if (paymentRes && paymentRes.ok) {
-      const payData = await paymentRes.json();
-      paymentApproved = payData.status === "approved";
-      console.log("MP payment result:", payData.status, payData.status_detail);
-    } else if (paymentRes) {
-      const payErrText = await paymentRes.text();
-      console.error("MP payment API error:", paymentRes.status, payErrText);
+      console.error("MP payment fetch error:", payErr?.message || payErr);
     }
 
     await prisma.subscription.upsert({
