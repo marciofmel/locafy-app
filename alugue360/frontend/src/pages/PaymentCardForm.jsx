@@ -65,12 +65,12 @@ export default function PaymentCardForm() {
                 setErr(res.error);
                 reject();
               } else if (res.paymentApproved) {
-                setSuccess(true);
-                resolve();
                 if (!navCalled.current) {
                   navCalled.current = true;
                   window.location.href = "/dashboard";
                 }
+                setSuccess(true);
+                resolve();
               } else {
                 const detail = res.paymentError ? ` (${res.paymentError})` : "";
                 setErr(`Assinatura criada, mas a cobrança não foi aprovada${detail}. Verifique seu cartão.`);
