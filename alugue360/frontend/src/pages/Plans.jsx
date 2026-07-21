@@ -26,7 +26,7 @@ export default function Plans() {
   function subscribe(planId) {
     if (!planId) return setErr("Plano indisponível");
     if (user) return navigate(`/payment/card/${planId}`);
-    navigate(`/checkout/${planId}`);
+    navigate(`/cadastro?plan=${planId}`);
   }
 
   return (

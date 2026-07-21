@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Menu, X, Home, Car, TreePine, PartyPopper, LayoutDashboard, LogIn, UserPlus, Heart } from "lucide-react";
+import { Menu, X, Home, Car, TreePine, PartyPopper, LayoutDashboard, LogIn, UserPlus, Heart, Search, Megaphone } from "lucide-react";
 import { useState } from "react";
 
 export default function Navbar() {
@@ -24,12 +24,17 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
+            <Link to="/" className="flex items-center gap-1 hover:text-emerald-200 transition font-medium">
+              <Search size={18} /> Quero alugar
+            </Link>
             {categories.map((cat) => (
-              <Link key={cat.slug} to={`/categoria/${cat.slug}`} className="flex items-center gap-1 hover:text-emerald-200 transition">
-                <cat.icon size={18} /> {cat.name}
+              <Link key={cat.slug} to={`/categoria/${cat.slug}`} className="flex items-center gap-1 hover:text-emerald-200 transition text-sm">
+                <cat.icon size={16} /> {cat.name}
               </Link>
             ))}
-            <Link to="/planos" className="hover:text-emerald-200 transition">Planos</Link>
+            <Link to="/planos" className="flex items-center gap-1 bg-emerald-500 px-3 py-1.5 rounded-lg hover:bg-emerald-400 transition font-medium">
+              <Megaphone size={18} /> Quero anunciar
+            </Link>
             {user ? (
               <>
                 <Link to="/favoritos" className="flex items-center gap-1 hover:text-emerald-200 transition">
@@ -64,12 +69,17 @@ export default function Navbar() {
 
       {open && (
         <div className="md:hidden px-4 pb-4 space-y-2">
+          <Link to="/" onClick={() => setOpen(false)} className="flex items-center gap-2 py-2 hover:bg-emerald-600 rounded px-2 font-medium">
+            <Search size={20} /> Quero alugar
+          </Link>
           {categories.map((cat) => (
-            <Link key={cat.slug} to={`/categoria/${cat.slug}`} onClick={() => setOpen(false)} className="flex items-center gap-2 py-2 hover:bg-emerald-600 rounded px-2">
-              <cat.icon size={20} /> {cat.name}
+            <Link key={cat.slug} to={`/categoria/${cat.slug}`} onClick={() => setOpen(false)} className="flex items-center gap-2 py-2 hover:bg-emerald-600 rounded px-2 ml-4 text-sm">
+              <cat.icon size={18} /> {cat.name}
             </Link>
           ))}
-          <Link to="/planos" onClick={() => setOpen(false)} className="block py-2 hover:bg-emerald-600 rounded px-2">Planos</Link>
+          <Link to="/planos" onClick={() => setOpen(false)} className="flex items-center gap-2 py-2 hover:bg-emerald-600 rounded px-2 bg-emerald-600 font-medium">
+            <Megaphone size={20} /> Quero anunciar
+          </Link>
           {user ? (
             <>
               <div className="flex items-center gap-2 py-2 px-2">

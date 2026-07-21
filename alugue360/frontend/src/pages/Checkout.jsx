@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { API } from "../config";
 import { Loader, CreditCard, QrCode, Barcode, ArrowLeft } from "lucide-react";
 
@@ -7,6 +8,7 @@ const MP_PUBLIC_KEY = "APP_USR-a1e6f75d-132d-4f50-9268-623e7c021169";
 
 export default function Checkout() {
   const { planId } = useParams();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
   const [plan, setPlan] = useState(null);
   const [method, setMethod] = useState("card");
@@ -47,20 +49,24 @@ export default function Checkout() {
               setProcessing(false);
               return reject();
             }
-            fetch(`${API}/plans/guest-card-payment`, {
+            const endpoint = token ? `${API}/plans/subscribe-with-card` : `${API}/plans/guest-card-payment`;
+            const headers = token
+              ? { "Content-Type": "application/json", Authorization: `Bearer ${token}` }
+              : { "Content-Type": "application/json" };
+
+            fetch(endpoint, {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers,
               body: JSON.stringify({ planId, cardTokenId, paymentMethodId }),
             }).then(r => r.json()).then(res => {
               setProcessing(false);
-              if (res.error) {
-                setErr(res.error);
-                reject();
-              } else if (res.success) {
-                navigate(`/register?plan=${planId}`);
+              if (res.error) { setErr(res.error); reject(); return; }
+              if (res.paymentApproved || res.success) {
+                navigate(token ? "/dashboard" : `/register?plan=${planId}`);
                 resolve();
               } else {
-                setErr("Pagamento não aprovado. Tente novamente.");
+                const detail = res.paymentError ? ` (${res.paymentError})` : "";
+                setErr(`Pagamento não aprovado${detail}. Tente novamente.`);
                 reject();
               }
             }).catch(() => {
@@ -79,20 +85,27 @@ export default function Checkout() {
       console.error("bricks init error:", err);
       setErr("Erro ao carregar formulário de pagamento");
     });
-  }, [plan, method]);
+  }, [plan, method, token]);
 
   const handlePixBoleto = async () => {
     setProcessing(true);
     setErr("");
     try {
-      const r = await fetch(`${API}/plans/guest-checkout`, {
+      const endpoint = token ? `${API}/plans/subscribe` : `${API}/plans/guest-checkout`;
+      const headers = token
+        ? { "Content-Type": "application/json", Authorization: `Bearer ${token}` }
+        : { "Content-Type": "application/json" };
+
+      const r = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ planId }),
       });
       const data = await r.json();
       if (data.error) { setErr(data.error); setProcessing(false); return; }
-      window.location.href = data.url;
+      if (data.url) window.location.href = data.url;
+      else if (data.success) navigate(token ? "/dashboard" : `/register?plan=${planId}`);
+      else { setErr("Erro ao processar pagamento"); setProcessing(false); }
     } catch {
       setErr("Erro ao criar checkout");
       setProcessing(false);
@@ -104,11 +117,11 @@ export default function Checkout() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-lg">
-        <Link to="/planos" className="text-emerald-600 hover:text-emerald-700 flex items-center gap-1 mb-4 text-sm">
-          <ArrowLeft size={16} /> Voltar para planos
+        <Link to={token ? "/dashboard" : "/planos"} className="text-emerald-600 hover:text-emerald-700 flex items-center gap-1 mb-4 text-sm">
+          <ArrowLeft size={16} /> Voltar
         </Link>
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Finalizar compra</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Finalizar pagamento</h1>
           {plan && <p className="text-gray-500 mt-1">{plan.name} — R$ {plan.price.toFixed(2)}/mês</p>}
         </div>
 

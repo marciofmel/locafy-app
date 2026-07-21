@@ -16,7 +16,6 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
 import PaymentCardForm from "./pages/PaymentCardForm";
 import Checkout from "./pages/Checkout";
-import RegisterAfterPayment from "./pages/RegisterAfterPayment";
 
 export default function App() {
   return (
@@ -39,7 +38,6 @@ export default function App() {
             <Route path="/payment/card/:planId" element={<PaymentCardForm />} />
             <Route path="/payment/cancel" element={<PaymentCancel />} />
             <Route path="/checkout/:planId" element={<Checkout />} />
-            <Route path="/register" element={<RegisterAfterPayment />} />
           </Route>
         </Routes>
       </AuthProvider>
