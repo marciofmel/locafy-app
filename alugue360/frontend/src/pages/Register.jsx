@@ -211,7 +211,7 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">RG ou CNH</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">RG (documento de identidade)</label>
             <div className="flex flex-col items-center gap-2">
               {rgPreview ? (
                 <img src={rgPreview} className="w-24 h-24 object-cover rounded-lg border" />
@@ -219,7 +219,7 @@ export default function Register() {
                 <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400"><IdCard size={32} /></div>
               )}
               <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 transition w-full text-center">
-                <Camera size={14} className="inline mr-1" /> Documento
+                <Camera size={14} className="inline mr-1" /> Foto do RG
                 <input type="file" accept="image/*" capture="environment" onChange={handleRg} className="hidden" />
               </label>
             </div>
