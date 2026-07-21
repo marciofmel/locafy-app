@@ -41,8 +41,7 @@ export default function Profile() {
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error);
-      setMsg("Perfil atualizado!");
-      if (avatarUrl) setAvatarPreview(avatarUrl);
+      navigate(-1);
     } catch (err) {
       setMsg("Erro: " + err.message);
     } finally {
