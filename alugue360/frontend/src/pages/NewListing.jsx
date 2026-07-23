@@ -209,20 +209,57 @@ export default function NewListing() {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Itens inclusos</label>
-          <div className="flex gap-2 mb-2 flex-wrap">
-            {features.map((f, i) => (
-              <span key={i} className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                {f} <button type="button" onClick={() => setFeatures(features.filter((_, idx) => idx !== i))} className="hover:text-red-600"><X size={14} /></button>
-              </span>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <input value={featureInput} onChange={e => setFeatureInput(e.target.value)} onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addFeature())} placeholder="Ex: Wi-Fi, Piscina, Ar condicionado" className="flex-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" />
-            <button type="button" onClick={addFeature} className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition"><Plus size={20} /></button>
-          </div>
-        </div>
+        {(() => {
+          const catName = categories.find(c => c.id === form.categoryId)?.name?.toLowerCase();
+          const isVehicle = catName === "carros" || catName === "motos";
+          if (isVehicle) {
+            const vehicleFeatures = [
+              "Ar-condicionado", "Câmbio automático", "Direção hidráulica", "Vidro elétrico",
+              "Trava elétrica", "Alarme", "Airbag", "Freio ABS", "Sensor de estacionamento",
+              "Câmera de ré", "Banco de couro", "Bluetooth", "Computador de bordo",
+              "Rodas de liga leve", "Desembaçador", "Som premium", "Teto solar",
+            ];
+            return (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Acessórios do veículo</label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {vehicleFeatures.map(f => (
+                    <label key={f} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer hover:text-emerald-700">
+                      <input type="checkbox" checked={features.includes(f)} onChange={e => {
+                        if (e.target.checked) setFeatures([...features, f]);
+                        else setFeatures(features.filter(x => x !== f));
+                      }} className="accent-emerald-600 w-4 h-4" />
+                      {f}
+                    </label>
+                  ))}
+                </div>
+                {features.length > 0 && (
+                  <div className="flex gap-1 mt-2 flex-wrap">
+                    {features.map(f => (
+                      <span key={f} className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs">{f}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }
+          return (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Itens inclusos</label>
+              <div className="flex gap-2 mb-2 flex-wrap">
+                {features.map((f, i) => (
+                  <span key={i} className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
+                    {f} <button type="button" onClick={() => setFeatures(features.filter((_, idx) => idx !== i))} className="hover:text-red-600"><X size={14} /></button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input value={featureInput} onChange={e => setFeatureInput(e.target.value)} onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addFeature())} placeholder="Ex: Wi-Fi, Piscina, Ar condicionado" className="flex-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" />
+                <button type="button" onClick={addFeature} className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition"><Plus size={20} /></button>
+              </div>
+            </div>
+          );
+        })()}
 
         <button type="submit" disabled={uploading} className="w-full bg-emerald-600 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-emerald-700 transition text-lg disabled:opacity-50">
           <Send size={20} /> Publicar Anúncio
