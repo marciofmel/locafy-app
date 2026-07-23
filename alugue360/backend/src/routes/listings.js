@@ -39,6 +39,15 @@ router.get("/", async (req, res) => {
   res.json({ listings, total, page, limit, hasMore: page * limit < total });
 });
 
+router.get("/featured", async (req, res) => {
+  const listings = await prisma.listing.findMany({
+    where: { active: true, featured: true },
+    include: { category: true },
+    orderBy: { createdAt: "desc" },
+  });
+  res.json(listings);
+});
+
 router.get("/:id", async (req, res) => {
   const listing = await prisma.listing.findUnique({
     where: { id: req.params.id },
@@ -171,15 +180,6 @@ router.put("/:id", authMiddleware, async (req, res) => {
     },
   });
   res.json(updated);
-});
-
-router.get("/featured", async (req, res) => {
-  const listings = await prisma.listing.findMany({
-    where: { active: true, featured: true },
-    include: { category: true },
-    orderBy: { createdAt: "desc" },
-  });
-  res.json(listings);
 });
 
 router.put("/:id/destacar", authMiddleware, async (req, res) => {
