@@ -13,6 +13,7 @@ import webhookRoutes from "./routes/webhook.js";
 import categoryRoutes from "./routes/categories.js";
 import uploadRoutes from "./routes/upload.js";
 import favoriteRoutes from "./routes/favorites.js";
+import adminRoutes from "./routes/admin.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -37,6 +38,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 app.use("/api/favorites", favoriteRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/webhook", webhookRoutes);
 
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
