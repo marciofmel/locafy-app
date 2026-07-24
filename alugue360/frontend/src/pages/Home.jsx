@@ -54,8 +54,16 @@ export default function Home() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-emerald-700 to-emerald-900 text-white py-16 md:py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="relative bg-gradient-to-br from-emerald-700 to-emerald-900 text-white py-16 md:py-20 px-4 overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.08]">
+          <img
+            src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1600&h=900&fit=crop"
+            alt=""
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+        <div className="max-w-4xl mx-auto text-center relative z-10">
           <h1 className="text-3xl md:text-5xl font-bold mb-4">Alugue o que precisar</h1>
           <p className="text-emerald-200 text-base md:text-lg mb-8">Casas, carros, ranchos e salões de festa perto de você</p>
           <div className="flex max-w-xl mx-auto bg-white rounded-lg overflow-hidden shadow-lg">
