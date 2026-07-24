@@ -57,7 +57,10 @@ app.use((err, req, res, next) => {
 });
 
 const frontendDist = path.join(__dirname, "..", "..", "frontend", "dist");
+const adminDist = path.join(__dirname, "..", "..", "admin", "dist");
 app.use(express.static(frontendDist));
+app.use("/admin", express.static(adminDist));
+app.get("/admin*", (req, res) => res.sendFile(path.join(adminDist, "index.html")));
 app.get("*", (req, res) => res.sendFile(path.join(frontendDist, "index.html")));
 
 const PORT = process.env.PORT || 3001;
