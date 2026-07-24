@@ -14,7 +14,6 @@ import categoryRoutes from "./routes/categories.js";
 import uploadRoutes from "./routes/upload.js";
 import favoriteRoutes from "./routes/favorites.js";
 import adminRoutes from "./routes/admin.js";
-import bcrypt from "bcryptjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
