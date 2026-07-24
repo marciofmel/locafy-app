@@ -14,6 +14,7 @@ import categoryRoutes from "./routes/categories.js";
 import uploadRoutes from "./routes/upload.js";
 import favoriteRoutes from "./routes/favorites.js";
 import adminRoutes from "./routes/admin.js";
+import bcrypt from "bcryptjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -42,6 +43,25 @@ app.use("/api/admin", adminRoutes);
 app.use("/webhook", webhookRoutes);
 
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
+
+// Setup: tornar um usuário admin (seguro por chave)
+app.post("/api/setup-admin", async (req, res) => {
+  if (req.query.key !== "locafy-admin-setup-2024") return res.status(403).json({ error: "chave inválida" });
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: "email obrigatório" });
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: { role: "admin" },
+      create: { email, name: email.split("@")[0], password: "temporary", role: "admin" },
+    });
+    res.json({ success: true, email: user.email, role: user.role });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Depois de usar, remover esta rota do código!
 
 // Error handler para erros do multer
 app.use((err, req, res, next) => {
