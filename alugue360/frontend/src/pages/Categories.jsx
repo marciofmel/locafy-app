@@ -50,7 +50,7 @@ export default function Categories() {
           <Link
             key={cat.slug}
             to={`/categoria/${cat.slug}`}
-            className={`group relative h-52 rounded-2xl overflow-hidden bg-gradient-to-br ${cat.gradient} shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]`}
+            className={`group relative h-40 sm:h-52 rounded-2xl overflow-hidden bg-gradient-to-br ${cat.gradient} shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]`}
           >
             <img
               src={cat.image}
@@ -60,10 +60,11 @@ export default function Categories() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
             <div className="relative z-10 flex flex-col justify-end h-full p-6 text-white">
-              <cat.icon size={36} className="mb-2 group-hover:scale-110 transition-transform" />
-              <h3 className="text-xl font-bold">{cat.name}</h3>
-              <p className="text-sm opacity-90 mt-1">{cat.desc}</p>
-              <p className="text-xs opacity-70 mt-1">{cat.count}</p>
+              <cat.icon size={28} className="sm:hidden mb-2 group-hover:scale-110 transition-transform" />
+              <cat.icon size={36} className="hidden sm:block mb-2 group-hover:scale-110 transition-transform" />
+              <h3 className="text-base sm:text-xl font-bold">{cat.name}</h3>
+              <p className="text-xs sm:text-sm opacity-90 mt-0.5 sm:mt-1">{cat.desc}</p>
+              <p className="text-xs opacity-70 mt-0.5 sm:mt-1">{cat.count}</p>
             </div>
           </Link>
         ))}
