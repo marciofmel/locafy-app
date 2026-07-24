@@ -3,12 +3,18 @@ import { useAuth } from "../context/AuthContext";
 import { Menu, X, Home, Car, TreePine, PartyPopper, LogIn, UserPlus, Heart, Settings, CreditCard, LogOut } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
+import { API } from "../config";
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [sub, setSub] = useState(null);
   const profileRef = useRef(null);
+
+  const hasPaidPlan = sub && sub.status === "active" && (sub.plan?.price || 0) >= 49.99;
+  const hasAnyPlan = sub && sub.status === "active";
 
   useEffect(() => {
     function handleClick(e) {
@@ -19,6 +25,18 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetch(`${API}/auth/me`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      }).then(r => r.json()).then(data => {
+        if (data.subscription) setSub(data.subscription);
+      }).catch(() => {});
+    } else {
+      setSub(null);
+    }
+  }, [user]);
 
   const categories = [
     { name: "Casas", slug: "casas", icon: Home },
@@ -42,6 +60,11 @@ export default function Navbar() {
                 <cat.icon size={18} /> {cat.name}
               </Link>
             ))}
+            {!hasAnyPlan && (
+              <Link to="/planos" className="flex items-center gap-1 hover:text-emerald-200 transition font-semibold">
+                <CreditCard size={18} /> Planos
+              </Link>
+            )}
             {user ? (
               <>
                 <Link to="/favoritos" className="flex items-center gap-1 hover:text-emerald-200 transition">
@@ -66,9 +89,11 @@ export default function Navbar() {
                         <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
                         <p className="text-xs text-gray-500 truncate">{user.email}</p>
                       </div>
-                      <button onClick={() => { setProfileOpen(false); navigate("/planos"); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition">
-                        <CreditCard size={16} className="text-gray-400" /> Upgrad
-                      </button>
+                      {hasPaidPlan && (
+                        <button onClick={() => { setProfileOpen(false); navigate("/planos"); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition">
+                          <CreditCard size={16} className="text-gray-400" /> Upgrad
+                        </button>
+                      )}
                       <button onClick={() => { setProfileOpen(false); navigate("/perfil"); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition">
                         <Settings size={16} className="text-gray-400" /> Editar perfil
                       </button>
@@ -101,6 +126,11 @@ export default function Navbar() {
               <cat.icon size={20} /> {cat.name}
             </Link>
           ))}
+          {!hasAnyPlan && (
+            <Link to="/planos" onClick={() => setOpen(false)} className="flex items-center gap-2 py-2 hover:bg-emerald-600 rounded px-2 font-semibold">
+              <CreditCard size={20} /> Planos
+            </Link>
+          )}
           {user ? (
             <>
               <div className="flex items-center gap-3 py-2 px-2 border-b border-emerald-600">
@@ -116,7 +146,9 @@ export default function Navbar() {
               </div>
               <Link to="/favoritos" onClick={() => setOpen(false)} className="block py-2 hover:bg-emerald-600 rounded px-2">Favoritos</Link>
               <Link to="/dashboard" onClick={() => setOpen(false)} className="block py-2 hover:bg-emerald-600 rounded px-2">Painel</Link>
-              <Link to="/planos" onClick={() => setOpen(false)} className="block py-2 hover:bg-emerald-600 rounded px-2">Upgrad</Link>
+              {hasPaidPlan && (
+                <Link to="/planos" onClick={() => setOpen(false)} className="block py-2 hover:bg-emerald-600 rounded px-2">Upgrad</Link>
+              )}
               <button onClick={() => { logout(); setOpen(false); }} className="w-full text-left py-2 text-red-300">Sair</button>
             </>
           ) : (
