@@ -1,2 +1,1 @@
-const base = window.location.origin;
-export const API = `${base}/api`;
+export const API = "https://locafy-app.onrender.com/api";

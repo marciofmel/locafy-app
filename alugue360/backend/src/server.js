@@ -24,7 +24,6 @@ try {
 } catch { console.log("⚠️ prisma db push falhou, continuando mesmo assim"); }
 
 
-
 export const prisma = new PrismaClient();
 
 const app = express();
@@ -45,23 +44,6 @@ app.use("/webhook", webhookRoutes);
 
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
-// Setup: tornar um usuário admin (seguro por chave)
-app.post("/api/setup-admin", async (req, res) => {
-  if (req.query.key !== "locafy-admin-setup-2024") return res.status(403).json({ error: "chave inválida" });
-  try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ error: "email obrigatório" });
-    const user = await prisma.user.upsert({
-      where: { email },
-      update: { role: "admin" },
-      create: { email, name: email.split("@")[0], password: "temporary", role: "admin" },
-    });
-    res.json({ success: true, email: user.email, role: user.role });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // Error handler para erros do multer
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
@@ -76,11 +58,6 @@ app.use((err, req, res, next) => {
 });
 
 const frontendDist = path.join(__dirname, "..", "..", "frontend", "dist");
-const adminDist = path.join(__dirname, "..", "..", "admin", "dist");
-
-app.use("/admin", express.static(adminDist));
-app.get("/admin*", (req, res) => res.sendFile(path.join(adminDist, "index.html")));
-
 app.use(express.static(frontendDist));
 app.get("*", (req, res) => res.sendFile(path.join(frontendDist, "index.html")));
 
