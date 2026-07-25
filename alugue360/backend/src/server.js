@@ -5,6 +5,7 @@ import path from "path";
 import multer from "multer";
 import { execSync } from "child_process";
 import { fileURLToPath } from "url";
+import fs from "fs";
 import { PrismaClient } from "@prisma/client";
 import authRoutes from "./routes/auth.js";
 import listingRoutes from "./routes/listings.js";
@@ -22,6 +23,17 @@ try {
   execSync("npx prisma db push --accept-data-loss", { stdio: "inherit", cwd: path.join(__dirname, "..") });
   console.log("✅ prisma db push concluído");
 } catch { console.log("⚠️ prisma db push falhou, continuando mesmo assim"); }
+
+// Build admin app se ainda não foi construído
+try {
+  const adminDir = path.join(__dirname, "..", "..", "admin");
+  const adminDist = path.join(adminDir, "dist");
+  if (!fs.existsSync(adminDist)) {
+    console.log("🏗️ Build admin app...");
+    execSync("npm install && npm run build", { stdio: "inherit", cwd: adminDir });
+    console.log("✅ Admin build concluído");
+  }
+} catch (e) { console.log("⚠️ Admin build:", e.message); }
 
 export const prisma = new PrismaClient();
 
@@ -60,8 +72,6 @@ app.post("/api/setup-admin", async (req, res) => {
   }
 });
 
-// Depois de usar, remover esta rota do código!
-
 // Error handler para erros do multer
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
@@ -78,7 +88,6 @@ app.use((err, req, res, next) => {
 const frontendDist = path.join(__dirname, "..", "..", "frontend", "dist");
 const adminDist = path.join(__dirname, "..", "..", "admin", "dist");
 
-// Admin SPA deve vir antes do frontend principal
 app.use("/admin", express.static(adminDist));
 app.get("/admin*", (req, res) => res.sendFile(path.join(adminDist, "index.html")));
 
