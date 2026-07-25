@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { API } from "../config";
-import { Plus, Edit3, Trash2, Check, X, CreditCard } from "lucide-react";
+import { Plus, Edit3, Trash2, CreditCard } from "lucide-react";
 
 export default function Plans() {
+  const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
-  const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ name: "", price: "", interval: "month", maxListings: 2, features: "", active: true });
   const token = localStorage.getItem("adminToken");
 
@@ -22,27 +23,10 @@ export default function Plans() {
     load();
   };
 
-  const update = async (id) => {
-    await fetch(`${API}/admin/plans/${id}`, { method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ ...form, price: Number(form.price), features: form.features.split("\n").filter(Boolean), maxListings: Number(form.maxListings) }) });
-    setEditingId(null);
-    setForm({ name: "", price: "", interval: "month", maxListings: 2, features: "", active: true });
-    load();
-  };
-
   const remove = async (id) => {
     if (!confirm("Excluir plano?")) return;
     await fetch(`${API}/admin/plans/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     load();
-  };
-
-  const startEdit = (p) => {
-    setEditingId(p.id);
-    setForm({ name: p.name, price: String(p.price), interval: p.interval, maxListings: p.maxListings, features: p.features.join("\n"), active: p.active });
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    setForm({ name: "", price: "", interval: "month", maxListings: 2, features: "", active: true });
   };
 
   return (
@@ -50,7 +34,7 @@ export default function Plans() {
       <h1 className="text-2xl font-bold">Planos</h1>
 
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2"><Plus size={16} /> {editingId ? "Editar" : "Novo"} Plano</h2>
+        <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2"><Plus size={16} /> Novo Plano</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
             <label className="text-xs text-gray-500 mb-1 block">Nome</label>
@@ -80,14 +64,7 @@ export default function Plans() {
           <label className="flex items-center gap-2 text-sm text-gray-400">
             <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} className="accent-emerald-500" /> Ativo
           </label>
-          {editingId ? (
-            <div className="flex gap-2 ml-auto">
-              <button onClick={() => update(editingId)} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-4 py-2 text-sm transition flex items-center gap-1"><Check size={15} /> Salvar</button>
-              <button onClick={cancelEdit} className="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 text-sm transition flex items-center gap-1"><X size={15} /> Cancelar</button>
-            </div>
-          ) : (
-            <button onClick={create} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-4 py-2 text-sm transition flex items-center gap-1 ml-auto"><Plus size={15} /> Criar</button>
-          )}
+          <button onClick={create} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-4 py-2 text-sm transition flex items-center gap-1 ml-auto"><Plus size={15} /> Criar</button>
         </div>
       </div>
 
@@ -100,7 +77,7 @@ export default function Plans() {
                 <p className="text-2xl font-bold mt-1">R$ {p.price.toFixed(2)} <span className="text-sm font-normal text-gray-500">/{p.interval === "year" ? "ano" : "mês"}</span></p>
               </div>
               <div className="flex gap-1">
-                <button onClick={() => startEdit(p)} className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition"><Edit3 size={15} /></button>
+                <button onClick={() => navigate(`/planos/editar/${p.id}`)} className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition"><Edit3 size={15} /></button>
                 <button onClick={() => remove(p.id)} className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-400 transition"><Trash2 size={15} /></button>
               </div>
             </div>
