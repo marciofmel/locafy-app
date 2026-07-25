@@ -5,7 +5,6 @@ import path from "path";
 import multer from "multer";
 import { execSync } from "child_process";
 import { fileURLToPath } from "url";
-import fs from "fs";
 import { PrismaClient } from "@prisma/client";
 import authRoutes from "./routes/auth.js";
 import listingRoutes from "./routes/listings.js";
@@ -24,16 +23,7 @@ try {
   console.log("✅ prisma db push concluído");
 } catch { console.log("⚠️ prisma db push falhou, continuando mesmo assim"); }
 
-// Build admin app se ainda não foi construído
-try {
-  const adminDir = path.join(__dirname, "..", "..", "admin");
-  const adminDist = path.join(adminDir, "dist");
-  if (!fs.existsSync(adminDist)) {
-    console.log("🏗️ Build admin app...");
-    execSync("npm install && npm run build", { stdio: "inherit", cwd: adminDir });
-    console.log("✅ Admin build concluído");
-  }
-} catch (e) { console.log("⚠️ Admin build:", e.message); }
+
 
 export const prisma = new PrismaClient();
 
