@@ -7,6 +7,7 @@ import Listings from "./pages/Listings";
 import Categories from "./pages/Categories";
 import Plans from "./pages/Plans";
 import EditPlan from "./pages/EditPlan";
+import NewPlan from "./pages/NewPlan";
 import EditCategory from "./pages/EditCategory";
 import NewCategory from "./pages/NewCategory";
 
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/categorias/nova" element={<Protected><NewCategory /></Protected>} />
         <Route path="/categorias/editar/:id" element={<Protected><EditCategory /></Protected>} />
         <Route path="/planos" element={<Protected><Plans /></Protected>} />
+        <Route path="/planos/novo" element={<Protected><NewPlan /></Protected>} />
         <Route path="/planos/editar/:id" element={<Protected><EditPlan /></Protected>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
