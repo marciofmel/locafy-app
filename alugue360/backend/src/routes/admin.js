@@ -110,9 +110,9 @@ router.delete("/listings/:id", async (req, res) => {
 // Categories (full admin CRUD)
 router.post("/categories", async (req, res) => {
   try {
-    const { name, slug, icon } = req.body;
+    const { name, slug, icon, image } = req.body;
     if (!name || !slug) return res.status(400).json({ error: "name e slug são obrigatórios" });
-    const cat = await prisma.category.create({ data: { name, slug, icon } });
+    const cat = await prisma.category.create({ data: { name, slug, icon, image } });
     res.json(cat);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -121,11 +121,12 @@ router.post("/categories", async (req, res) => {
 
 router.put("/categories/:id", async (req, res) => {
   try {
-    const { name, slug, icon } = req.body;
+    const { name, slug, icon, image } = req.body;
     const data = {};
     if (name) data.name = name;
     if (slug) data.slug = slug;
     if (icon !== undefined) data.icon = icon;
+    if (image !== undefined) data.image = image;
     const cat = await prisma.category.update({ where: { id: req.params.id }, data });
     res.json(cat);
   } catch (err) {
