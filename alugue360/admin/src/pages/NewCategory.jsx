@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API } from "../config";
+import ImageUpload from "../components/ImageUpload";
 import { ArrowLeft, Save, Tags } from "lucide-react";
 
 export default function NewCategory() {
   const navigate = useNavigate();
   const token = localStorage.getItem("adminToken");
-  const [form, setForm] = useState({ name: "", slug: "", icon: "", image: "" });
+  const [form, setForm] = useState({ name: "", slug: "", image: "" });
 
   const create = async () => {
     if (!form.name || !form.slug) return;
@@ -36,14 +37,7 @@ export default function NewCategory() {
           <label className="text-xs text-gray-500 mb-1 block">Slug</label>
           <input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-emerald-500" />
         </div>
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Ícone (opcional)</label>
-          <input value={form.icon} onChange={e => setForm({ ...form, icon: e.target.value })} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-emerald-500" placeholder="lucide-icon-name" />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">URL da Imagem (opcional)</label>
-          <input value={form.image} onChange={e => setForm({ ...form, image: e.target.value })} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-emerald-500" placeholder="https://..." />
-        </div>
+        <ImageUpload value={form.image} onChange={url => setForm({ ...form, image: url })} label="Imagem da Categoria" />
         <div className="flex justify-end gap-2">
           <button onClick={() => navigate("/categorias")} className="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 text-sm transition">Cancelar</button>
           <button onClick={create} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-4 py-2 text-sm transition flex items-center gap-1"><Save size={15} /> Salvar</button>
