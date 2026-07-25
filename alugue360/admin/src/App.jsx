@@ -7,6 +7,7 @@ import Listings from "./pages/Listings";
 import Categories from "./pages/Categories";
 import Plans from "./pages/Plans";
 import EditPlan from "./pages/EditPlan";
+import EditCategory from "./pages/EditCategory";
 
 function Protected({ children }) {
   const token = localStorage.getItem("adminToken");
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/usuarios" element={<Protected><Users /></Protected>} />
         <Route path="/anuncios" element={<Protected><Listings /></Protected>} />
         <Route path="/categorias" element={<Protected><Categories /></Protected>} />
+        <Route path="/categorias/editar/:id" element={<Protected><EditCategory /></Protected>} />
         <Route path="/planos" element={<Protected><Plans /></Protected>} />
         <Route path="/planos/editar/:id" element={<Protected><EditPlan /></Protected>} />
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -24,7 +24,7 @@ export default function Login() {
       if (user.role !== "admin") throw new Error("Acesso restrito a administradores");
 
       localStorage.setItem("adminToken", data.token);
-      navigate("/admin");
+      navigate("/");
     } catch (err) {
       setError(err.message);
     } finally {

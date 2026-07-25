@@ -63,7 +63,7 @@ export default function Dashboard() {
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-gray-300">Últimos Usuários</h2>
-            <Link to="/admin/usuarios" className="text-xs text-emerald-400 hover:underline flex items-center gap-1">Ver todos <ArrowRight size={12} /></Link>
+            <Link to="/usuarios" className="text-xs text-emerald-400 hover:underline flex items-center gap-1">Ver todos <ArrowRight size={12} /></Link>
           </div>
           <div className="space-y-2">
             {data.recentUsers.map(u => (
@@ -83,7 +83,7 @@ export default function Dashboard() {
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-gray-300">Últimos Anúncios</h2>
-            <Link to="/admin/anuncios" className="text-xs text-emerald-400 hover:underline flex items-center gap-1">Ver todos <ArrowRight size={12} /></Link>
+            <Link to="/anuncios" className="text-xs text-emerald-400 hover:underline flex items-center gap-1">Ver todos <ArrowRight size={12} /></Link>
           </div>
           <div className="space-y-2">
             {data.recentListings.map(l => (
