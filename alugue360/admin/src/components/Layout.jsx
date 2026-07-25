@@ -3,11 +3,11 @@ import { LayoutDashboard, Users, Home, Tags, CreditCard, LogOut, Menu, X } from 
 import { useState } from "react";
 
 const nav = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/admin/usuarios", label: "Usuários", icon: Users },
-  { to: "/admin/anuncios", label: "Anúncios", icon: Home },
-  { to: "/admin/categorias", label: "Categorias", icon: Tags },
-  { to: "/admin/planos", label: "Planos", icon: CreditCard },
+  { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/usuarios", label: "Usuários", icon: Users },
+  { to: "/anuncios", label: "Anúncios", icon: Home },
+  { to: "/categorias", label: "Categorias", icon: Tags },
+  { to: "/planos", label: "Planos", icon: CreditCard },
 ];
 
 export default function Layout({ children }) {
@@ -16,7 +16,7 @@ export default function Layout({ children }) {
 
   const logout = () => {
     localStorage.removeItem("adminToken");
-    navigate("/admin/login");
+    navigate("/login");
   };
 
   return (
